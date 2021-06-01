@@ -6,6 +6,7 @@ import { CourseStatus, PostMessage } from "./postMessage";
 import type { Course } from "./types/CourseSchema";
 import { CourseSchema } from "./types/CourseSchema";
 import GetEnv from "./utils/env_get_or_throw";
+import logger from "./logger";
 
 const LINE_TOKEN = GetEnv("LINE_TOKEN");
 
@@ -35,8 +36,12 @@ export interface CronTable {
  */
 function CourseCSVParser(filename: string): Promise<Course[]> {
   return new Promise((resolve, reject) => {
+    const log = logger("parser.CourseCSVParser");
+    log.info(`Converting this file to Course list: ${filename}`);
+
     const courseTable: Course[] = [];
     const contentLineNumber = 2;
+
     fs.createReadStream(filename)
       .pipe(csvParser())
       .on("data", (data: unknown) => {
@@ -55,6 +60,7 @@ function CourseCSVParser(filename: string): Promise<Course[]> {
 }
 
 function CourseListToCronTable(courseList: Course[]): CronTable[] {
+  const log = logger("parser.CourseListToCronTable");
   const endTable: CronTable[] = [];
   const endAppender =
     ([eh, em]: string[], week: string) =>
@@ -82,6 +88,9 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
       endWork = null;
     }
 
+    log.info(
+      `Processing: ${course} @ Day of Week: ${week}, ${start} ~ ${end}$`
+    );
     const timeHmParser = (time: string) => time.split(":");
     const [sh, sm] = timeHmParser(start);
     endWork = endAppender(timeHmParser(end), week);
@@ -109,7 +118,9 @@ export async function CourseCSVToCronTable(
 }
 
 export function Scheduler(cronTable: CronTable[]): void {
+  const log = logger("parser.CourseListToCronTable");
   cronTable.forEach(({ cron: _cron, action }) => {
+    log.debug(`Registering: ${_cron}`);
     // console.debug(`Registered: ${_cron}`);
     cron.schedule(_cron, action);
   });
