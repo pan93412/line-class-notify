@@ -22,6 +22,11 @@ week,chap,start,end,course
 1,5,12:05,13:00,間隔時間
 ```
 
+## Configure
+
+Copy a `.env.example`, fill in the information,
+and rename it to `.env`.
+
 ### Running
 
 ```zsh
