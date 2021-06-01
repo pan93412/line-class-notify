@@ -1,5 +1,7 @@
 # line-class-notify
 
+Notify anything about your class on your LINE.
+
 ## Usage
 
 ### Make a School Table
