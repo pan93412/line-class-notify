@@ -5,8 +5,9 @@ import { ValidationError } from "myzod";
 import { CourseStatus, PostMessage } from "./postMessage";
 import type { Course } from "./types/CourseSchema";
 import { CourseSchema } from "./types/CourseSchema";
+import GetEnv from "./utils/env_get_or_throw";
 
-const LINE_TOKEN = "453vWIQwb8i4lzOYVBCacvG6fXGPCRvyqRvWaUtXW0q";
+const LINE_TOKEN = GetEnv("LINE_TOKEN");
 
 export interface CronTable {
   cron: string;
