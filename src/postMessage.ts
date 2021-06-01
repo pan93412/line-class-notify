@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import logger from "./logger";
 
 const API_ENDPOINT = "https://notify-api.line.me/api/notify";
 
@@ -31,10 +32,12 @@ export async function PostMessage(
   notification: Notification,
   token: string
 ): Promise<boolean> {
+  const log = logger("postMessage.PostMessage");
   const message = postMessageFormatter(notification);
   const body = new URLSearchParams();
   body.append("message", message);
 
+  log.info("Start posting message to a LINE group");
   const resp = await fetch(API_ENDPOINT, {
     method: "POST",
     body,
@@ -43,12 +46,15 @@ export async function PostMessage(
     },
   });
 
+  log.debug("Checking if it succeed");
   if (resp.ok) {
     if ((await resp.json()).status === 200) {
+      log.debug("Yes! returning true");
       return true;
     }
   }
 
+  log.debug("No... returning false");
   return false;
 }
 
