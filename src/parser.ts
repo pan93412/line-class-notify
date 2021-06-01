@@ -42,7 +42,7 @@ function CourseCSVParser(filename: string): Promise<Course[]> {
         const course = CourseSchema.try(data);
 
         if (course instanceof ValidationError) {
-          reject(`Line ${contentLineNumber}: Malformed!`);
+          reject(new Error(`Line ${contentLineNumber}: Malformed!`));
           return;
         }
 
@@ -54,6 +54,7 @@ function CourseCSVParser(filename: string): Promise<Course[]> {
 }
 
 function CourseListToCronTable(courseList: Course[]): CronTable[] {
+  const endTable: CronTable[] = [];
   const endAppender =
     ([eh, em]: string[], week: string) =>
     (course: string) =>
@@ -70,7 +71,6 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
       });
 
   let endWork: ((course: string) => void) | null = null;
-  const endTable: CronTable[] = [];
   const startTable = courseList.map(({ week, start, end, course }) => {
     // Why I do that is because of I need to get the current
     // course with the previous "end" time.  If we have the
@@ -107,9 +107,9 @@ export async function CourseCSVToCronTable(
   return CourseListToCronTable(await CourseCSVParser(filename));
 }
 
-export function Scheduler(cronTable: CronTable[]) {
-  cronTable.map(({ cron: _cron, action }) => {
-    console.debug(`Registered: ${_cron}`);
+export function Scheduler(cronTable: CronTable[]): void {
+  cronTable.forEach(({ cron: _cron, action }) => {
+    // console.debug(`Registered: ${_cron}`);
     cron.schedule(_cron, action);
   });
 }
