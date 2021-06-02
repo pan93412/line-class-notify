@@ -81,14 +81,14 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
           ),
       });
 
-  let endWork: ((course: string) => void) | null = null;
+  let endWork: ReturnType<typeof endAppender> | null = null;
   const startTable = courseList.map(({ week, chap, start, end, course }) => {
     // Why I do that is because of I need to get the current
     // course with the previous "end" time.  If we have the
     // non-processed previous "end" time, we will process it first.
     // Then, we set endWork to "null" and wait for the next task.
     if (endWork) {
-      endWork(course);
+      endWork(course, week);
       endWork = null;
     }
 
