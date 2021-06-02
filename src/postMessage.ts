@@ -25,7 +25,7 @@ function postMessageFormatter({ course, status }: Notification): string {
     case CourseStatus.ENDED:
       return `<< 本節課結束。下節課是${course}。`;
     case CourseStatus.OVER_SCHOOL:
-      return `!! 下課了～明天第一節課是${course}。`;
+      return `!! 本日課結束。下次上課的第一節課是${course}。`;
     default:
       throw new Error("Runtime Error: 不正確的 status 值。");
   }
