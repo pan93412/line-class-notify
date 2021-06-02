@@ -40,7 +40,7 @@ function CourseCSVParser(filename: string): Promise<Course[]> {
     log.info(`Converting this file to Course list: ${filename}`);
 
     const courseTable: Course[] = [];
-    const contentLineNumber = 2;
+    let contentLineNumber = 2;
 
     fs.createReadStream(filename)
       .pipe(csvParser())
@@ -53,6 +53,7 @@ function CourseCSVParser(filename: string): Promise<Course[]> {
         }
 
         courseTable.push(course);
+        contentLineNumber += 1;
       })
       .on("end", () => resolve(courseTable))
       .on("error", reject);
