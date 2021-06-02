@@ -6,6 +6,7 @@ const API_ENDPOINT = "https://notify-api.line.me/api/notify";
 export enum CourseStatus {
   STARTED,
   ENDED,
+  OVER_SCHOOL,
 }
 
 export interface Notification {
@@ -23,6 +24,8 @@ function postMessageFormatter({ course, status }: Notification): string {
       return `>> ${course}課開始。`;
     case CourseStatus.ENDED:
       return `<< 本節課結束。下節課是${course}。`;
+    case CourseStatus.OVER_SCHOOL:
+      return `!! 下課了～明天第一節課是${course}。`;
     default:
       throw new Error("Runtime Error: 不正確的 status 值。");
   }
