@@ -64,13 +64,16 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
   const endTable: CronTable[] = [];
   const endAppender =
     ([eh, em]: string[], week: string) =>
-    (course: string) =>
+    (course: string, newWeek: string = week) =>
       endTable.push({
         cron: `0 ${em} ${eh} * * ${week}`,
         action: () =>
           PostMessage(
             {
-              status: CourseStatus.ENDED,
+              status:
+                newWeek !== week
+                  ? CourseStatus.OVER_SCHOOL
+                  : CourseStatus.ENDED,
               course,
             },
             LINE_TOKEN
@@ -78,7 +81,7 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
       });
 
   let endWork: ((course: string) => void) | null = null;
-  const startTable = courseList.map(({ week, start, end, course }) => {
+  const startTable = courseList.map(({ week, chap, start, end, course }) => {
     // Why I do that is because of I need to get the current
     // course with the previous "end" time.  If we have the
     // non-processed previous "end" time, we will process it first.
@@ -89,7 +92,7 @@ function CourseListToCronTable(courseList: Course[]): CronTable[] {
     }
 
     log.info(
-      `Processing: ${course} @ Day of Week: ${week}, ${start} ~ ${end}$`
+      `Processing: [${chap}] ${course} @ Day of Week: ${week}, ${start} ~ ${end}.`
     );
     const timeHmParser = (time: string) => time.split(":");
     const [sh, sm] = timeHmParser(start);
